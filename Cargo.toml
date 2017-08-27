@@ -1,0 +1,20 @@
+[package]
+name = "pushover"
+version = "0.1.0"
+authors = ["Steven Blake <s.blake.08@aberdeen.ac.uk>"]
+
+[dependencies]
+hyper = "0.11"
+hyper-tls = "0.1"
+tokio-core = "0.1"
+error-chain = "0.10"
+native-tls = "0.1" # review this later? Maybe this can be exported from hyper-tls
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+futures = "0.1"
+urlencoding = "1.0"
+url = "1.5"
+
+[dev-dependencies]
+mockito = "0.8"
