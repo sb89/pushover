@@ -1,4 +1,4 @@
-Fixerio
+Pushover
 =========================
 [![Build Status](https://img.shields.io/travis/sb89/pushover/master.svg)](https://travis-ci.org/sb89/pushover)
 [![License](https://img.shields.io/github/license/sb89/pushover.svg)]()
