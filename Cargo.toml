@@ -3,6 +3,13 @@ name = "pushover"
 version = "0.1.0"
 authors = ["Steven Blake <s.blake.08@aberdeen.ac.uk>"]
 
+description = "A wrapper for the Pushover API."
+documentation = "https://docs.rs/pushover"
+keywords = ["pushover", "notification", "api", "wrapper"]
+license = "MIT"
+homepage = "https://github.com/sb89/pushover"
+repository = "https://github.com/sb89/pushover.git"
+
 [dependencies]
 hyper = "0.11"
 hyper-tls = "0.1"
