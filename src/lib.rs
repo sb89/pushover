@@ -7,7 +7,7 @@
 //!
 //! ```rust,ignore
 //! [dependencies]
-//! pushover = "0.1.0"
+//! pushover = "0.2.0"
 //! ```
 //!
 //! Synchronous example:

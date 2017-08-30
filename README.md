@@ -14,7 +14,7 @@ Add the following to `Cargo.toml`:
 
 ```toml
 [dependencies]
-pushover = "0.1.0"
+pushover = "0.2.0"
 ```
 
 Synchronous example:
