@@ -1,4 +1,4 @@
-use hyper::Method;
+use reqwest::Method;
 use url::Url;
 
 use requests::base::{Request, RawResponse};

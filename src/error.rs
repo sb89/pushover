@@ -1,9 +1,8 @@
 error_chain! {
     foreign_links {
-        Hyper(::hyper::Error);
-        Tls(::native_tls::Error);
         Json(::serde_json::Error);
         Io(::std::io::Error);
+        Reqqest(::reqwest::Error);
     }
 
     errors {

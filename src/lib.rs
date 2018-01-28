@@ -55,9 +55,6 @@
 //! ```
 
 extern crate tokio_core;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate native_tls;
 #[macro_use]
 extern crate error_chain;
 extern crate serde;
@@ -67,6 +64,7 @@ extern crate serde_derive;
 extern crate futures;
 extern crate urlencoding;
 extern crate url;
+extern crate reqwest;
 
 mod client;
 mod error;

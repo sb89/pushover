@@ -1,6 +1,6 @@
 use std::fmt;
 
-use hyper::Method;
+use reqwest::Method;
 use serde::de::{Deserialize, DeserializeOwned, Deserializer};
 use error::ErrorKind;
 use url::{Url, UrlQuery};
