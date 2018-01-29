@@ -7,8 +7,7 @@ use reqwest;
 use reqwest::unstable::async;
 use tokio_core::reactor::Handle;
 
-use std::cell::RefCell;
-use std::time::Duration;
+use std::mem;
 
 use error::Error;
 use future::PushoverFuture;
@@ -24,10 +23,45 @@ pub struct AsyncAPI {
 
 impl AsyncAPI {
     pub fn new(handle: &Handle) -> Self {
-        AsyncAPI{
+        AsyncAPI {
             base_url: API_URL.to_owned(),
             client: async::Client::new(handle)
         }
+    }
+
+    pub fn send<R: Request>(&self, request: &R) -> PushoverFuture<<R as Request>::ResponseType> {
+        let mut url = Url::parse(&self.base_url).unwrap();
+        url.set_path(API_VERSION);
+
+        request.build_url(&mut url);
+
+        let mut req = self.client.request(request.get_method(), url);
+
+        if let Some(params) = request.get_form_parameters() {
+            let encoded: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(params.into_iter())
+                .finish();
+
+            req.body(encoded);
+        }
+
+        let response = req.send()
+            .map_err(From::from)
+            .and_then(|mut res| {
+                let body = mem::replace(res.body_mut(), async::Decoder::empty());
+                body.concat2().map_err(Into::into)
+            });
+
+        let future = response.and_then(|bytes| {
+            result(serde_json::from_slice(&bytes)
+                       .map_err(From::from)
+                       .and_then(|value| match value {
+                                     Response::Success::<R>(raw) => Ok(R::map(raw)), 
+                                     Response::Error::<R>(err) => Err(err.into()),                        
+                                 }))
+        });
+
+        PushoverFuture::new(Box::new(future))
     }
 }
 
