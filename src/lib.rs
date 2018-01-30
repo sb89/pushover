@@ -73,7 +73,7 @@ mod types;
 mod deserializers;
 pub mod requests;
 
-pub use self::client::{AsyncAPI, SyncAPI};
+pub use self::client::{AsyncAPI, AsyncAPIBuilder, SyncAPI, SyncAPIBuilder};
 pub use self::future::PushoverFuture;
 pub use self::types::{Priority, OperatingSystem, Sound, User, UserType};
 pub use self::error::{Error, ErrorKind};

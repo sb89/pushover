@@ -8,6 +8,7 @@ use reqwest::unstable::async;
 use tokio_core::reactor::Handle;
 
 use std::mem;
+use std::time::Duration;
 
 use error::Error;
 use future::PushoverFuture;
@@ -15,6 +16,45 @@ use requests::{Request, Response};
 
 pub const API_URL: &'static str = "https://api.pushover.net";
 pub const API_VERSION: &'static str = "1";
+const DEFAULT_TIMEOUT: u64 = 30;
+
+pub struct AsyncAPIBuilder {
+    inner: async::ClientBuilder,
+    base_url: String
+}
+
+impl AsyncAPIBuilder {
+    pub fn new() -> Self {
+        let mut inner = async::ClientBuilder::new();
+        inner.timeout(Duration::from_secs(DEFAULT_TIMEOUT));
+
+        AsyncAPIBuilder {
+            inner: inner,
+            base_url: API_URL.to_owned()
+        }
+    }
+
+    pub fn timeout(&mut self, timeout: Duration) -> &mut AsyncAPIBuilder 
+    {
+        self.inner.timeout(timeout);
+        self
+    }
+
+    pub fn base_url(&mut self, url: &str) -> &mut AsyncAPIBuilder 
+    {
+        self.base_url = url.to_owned();
+        self
+    }    
+
+    pub fn build(&mut self, handle: &Handle) -> Result<AsyncAPI, Error> {
+        let client = self.inner.build(handle)?;
+
+        Ok(AsyncAPI{
+            base_url: self.base_url.to_owned(),
+            client: client
+        })
+    }
+}
 
 pub struct AsyncAPI {
     base_url: String,
@@ -22,13 +62,6 @@ pub struct AsyncAPI {
 }
 
 impl AsyncAPI {
-    pub fn new(handle: &Handle) -> Self {
-        AsyncAPI {
-            base_url: API_URL.to_owned(),
-            client: async::Client::new(handle)
-        }
-    }
-
     pub fn send<R: Request>(&self, request: &R) -> PushoverFuture<<R as Request>::ResponseType> {
         let mut url = Url::parse(&self.base_url).unwrap();
         url.set_path(API_VERSION);
@@ -62,6 +95,44 @@ impl AsyncAPI {
         });
 
         PushoverFuture::new(Box::new(future))
+    }
+}
+
+pub struct SyncAPIBuilder {
+    inner: reqwest::ClientBuilder,
+    base_url: String
+}
+
+impl SyncAPIBuilder {
+    pub fn new() -> Self {
+        let mut inner = reqwest::ClientBuilder::new();
+        inner.timeout(Duration::from_secs(DEFAULT_TIMEOUT));
+
+        SyncAPIBuilder{
+            inner: inner,
+            base_url: API_URL.to_owned()
+        }
+    }
+
+    pub fn timeout(&mut self, timeout: Duration) -> &mut SyncAPIBuilder 
+    {
+        self.inner.timeout(timeout);
+        self
+    }
+
+    pub fn base_url(&mut self, url: &str) -> &mut SyncAPIBuilder 
+    {
+        self.base_url = url.to_owned();
+        self
+    }    
+
+    pub fn build(&mut self) -> Result<SyncAPI, Error> {
+        let client = self.inner.build()?;
+
+        Ok(SyncAPI{
+            base_url: self.base_url.to_owned(),
+            client: client
+        })
     }
 }
 
