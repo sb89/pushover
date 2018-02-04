@@ -16,11 +16,11 @@
 //!
 //! extern crate pushover;
 //!
-//! use pushover::SyncAPI;
+//! use pushover::{SyncAPI, SyncAPIBuilder};
 //! use pushover::requests::message::SendMessage;
 //!
 //! fn main() {
-//!     let api = SyncAPI::new().expect("Error creating API");
+//!     let api = SyncAPIBuilder::new().build().expect("Error creating API");
 //!
 //!     let msg = SendMessage::new("token", "user_key", "hello");
 //!
@@ -37,7 +37,7 @@
 //! extern crate pushover;
 //! extern crate tokio_core;
 //!
-//! use pushover::{AsyncAPI};
+//! use pushover::{AsyncAPI, AsyncAPIBuilder};
 //! use pushover::requests::message::SendMessage;
 //! use tokio_core::reactor::Core;
 //!
@@ -45,7 +45,7 @@
 //!     let mut core = Core::new().expect("Error creating core");
 //!     let handle = core.handle();
 //!
-//!     let api = AsyncAPI::new(&handle).expect("Error creating API");
+//!     let api = AsyncAPIBuilder::new().build(&handle).expect("Error creating API");
 //!
 //!     let msg = SendMessage::new("token", "user_key", "hello");
 //!     let work = api.send(&msg);

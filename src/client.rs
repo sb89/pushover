@@ -142,13 +142,6 @@ pub struct SyncAPI {
 }
 
 impl SyncAPI {
-    pub fn new() -> Self {
-        SyncAPI {
-            base_url: API_URL.to_owned(),
-            client: reqwest::Client::new()
-        }
-    }
-
     pub fn send<R: Request>(&self, request: &R) -> Result<<R as Request>::ResponseType, Error> {
         let mut url = Url::parse(&self.base_url).unwrap();
         url.set_path(API_VERSION);
