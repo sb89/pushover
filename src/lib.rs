@@ -7,7 +7,7 @@
 //!
 //! ```rust,ignore
 //! [dependencies]
-//! pushover = "0.2.0"
+//! pushover = "0.3.0"
 //! ```
 //!
 //! Synchronous example:
@@ -16,7 +16,7 @@
 //!
 //! extern crate pushover;
 //!
-//! use pushover::{SyncAPI, SyncAPIBuilder};
+//! use pushover::SyncAPIBuilder;
 //! use pushover::requests::message::SendMessage;
 //!
 //! fn main() {
@@ -37,7 +37,7 @@
 //! extern crate pushover;
 //! extern crate tokio_core;
 //!
-//! use pushover::{AsyncAPI, AsyncAPIBuilder};
+//! use pushover::AsyncAPIBuilder;
 //! use pushover::requests::message::SendMessage;
 //! use tokio_core::reactor::Core;
 //!

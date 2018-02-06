@@ -14,7 +14,7 @@ Add the following to `Cargo.toml`:
 
 ```toml
 [dependencies]
-pushover = "0.2.0"
+pushover = "0.3.0"
 ```
 
 Synchronous example:
@@ -23,11 +23,11 @@ Synchronous example:
 
 extern crate pushover;
 
-use pushover::SyncAPI;
+use pushover::SyncAPIBuilder;
 use pushover::requests::message::SendMessage;
 
 fn main() {
-    let api = SyncAPI::new().expect("Error creating API");
+    let api = SyncAPIBuilder::new().build().expect("Error creating API");
 
     let msg = SendMessage::new("token", "user_key", "hello");
 
@@ -43,7 +43,7 @@ Asynchronous example:
 extern crate pushover;
 extern crate tokio_core;
 
-use pushover::{AsyncAPI};
+use pushover::AsyncAPIBuilder;
 use pushover::requests::message::SendMessage;
 use tokio_core::reactor::Core;
 
@@ -51,7 +51,7 @@ fn main() {
     let mut core = Core::new().expect("Error creating core");
     let handle = core.handle();
 
-    let api = AsyncAPI::new(&handle).expect("Error creating API");
+    let api = AsyncAPIBuilder::new().build(&handle).expect("Error creating API");
 
     let msg = SendMessage::new("token", "user_key", "hello");
     let work = api.send(&msg);
