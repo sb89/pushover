@@ -1,7 +1,8 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{Request, RawResponse};
+use crate::requests::base::{RawResponse, Request};
 
 /// Get limitations
 ///
@@ -13,9 +14,12 @@ pub struct Limits {
 
 impl Limits {
     pub fn new<T>(token: T) -> Self
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
-        Self { token: token.into() }
+        Self {
+            token: token.into(),
+        }
     }
 }
 
@@ -24,7 +28,7 @@ impl Request for Limits {
     type RawResponseType = RawLimitsResponse;
 
     fn get_method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn build_url(&self, url: &mut Url) {
@@ -73,7 +77,7 @@ impl RawResponse for RawLimitsResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {

@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse};
+use crate::requests::base::{RawBasicResponse, Request};
 
 /// Acknowledge an emergency-priority message
 ///
@@ -14,8 +14,9 @@ pub struct Acknowledge {
 
 impl Acknowledge {
     pub fn new<S, R>(secret: S, receipt: R) -> Self
-        where S: Into<String>,
-              R: Into<String>
+    where
+        S: Into<String>,
+        R: Into<String>,
     {
         Self {
             receipt: receipt.into(),
@@ -37,11 +38,10 @@ impl Request for Acknowledge {
 
         let mut params = url.query_pairs_mut();
         params.append_pair("secret", &self.secret);
-
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -52,14 +52,16 @@ impl Request for Acknowledge {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = Acknowledge::new("ack_secret", "ack_receipt");
 
-        assert_req_url(&req,
-                       &format!("receipts/{}/acknowledge.json", req.receipt),
-                       Some(&[("secret", &req.secret)]));
+        assert_req_url(
+            &req,
+            &format!("receipts/{}/acknowledge.json", req.receipt),
+            Some(&[("secret", &req.secret)]),
+        );
     }
 }

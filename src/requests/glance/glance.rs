@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse, add_optional_param};
+use crate::requests::base::{add_optional_param, RawBasicResponse, Request};
 
 /// Send a Glance request
 ///
@@ -20,8 +20,9 @@ pub struct Glance {
 
 impl Glance {
     pub fn new<T, U>(token: T, user_key: U) -> Self
-        where T: Into<String>,
-              U: Into<String>
+    where
+        T: Into<String>,
+        U: Into<String>,
     {
         Self {
             token: token.into(),
@@ -79,7 +80,7 @@ impl Request for Glance {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -90,7 +91,7 @@ impl Request for Glance {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_with_all_fields() {
@@ -102,18 +103,30 @@ mod tests {
         req.set_count(10);
         req.set_percent(80);
 
-        assert_req_url(&req,
-                       "glances.json",
-                       Some(&[("token", &req.token) ,("user", &req.user_key), ("device", &req.device.as_ref().unwrap()), ("title", &req.title.as_ref().unwrap()),
-                       ("text", &req.text.as_ref().unwrap()), ("subtext", &req.subtext.as_ref().unwrap()), ("count", &req.count.unwrap().to_string()), ("percent", &req.percent.unwrap().to_string())]));
+        assert_req_url(
+            &req,
+            "glances.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("device", &req.device.as_ref().unwrap()),
+                ("title", &req.title.as_ref().unwrap()),
+                ("text", &req.text.as_ref().unwrap()),
+                ("subtext", &req.subtext.as_ref().unwrap()),
+                ("count", &req.count.unwrap().to_string()),
+                ("percent", &req.percent.unwrap().to_string()),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_mandatory_fields() {
         let req = Glance::new("glance_token", "glance_user_key");
 
-        assert_req_url(&req,
-                       "glances.json",
-                       Some(&[("token", &req.token) ,("user", &req.user_key)]));
+        assert_req_url(
+            &req,
+            "glances.json",
+            Some(&[("token", &req.token), ("user", &req.user_key)]),
+        );
     }
 }

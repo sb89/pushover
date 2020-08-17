@@ -1,7 +1,8 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{RawResponse, Request};
+use crate::requests::base::{RawResponse, Request};
 
 /// Login user
 ///
@@ -14,8 +15,9 @@ pub struct Login {
 
 impl Login {
     pub fn new<E, P>(email: E, password: P) -> Self
-        where E: Into<String>,
-              P: Into<String>
+    where
+        E: Into<String>,
+        P: Into<String>,
     {
         Self {
             email: email.into(),
@@ -29,11 +31,14 @@ impl Request for Login {
     type RawResponseType = RawLoginResponse;
 
     fn build_url(&self, url: &mut Url) {
-        url.path_segments_mut().unwrap().push("users").push("login.json");
+        url.path_segments_mut()
+            .unwrap()
+            .push("users")
+            .push("login.json");
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -45,8 +50,7 @@ impl Request for Login {
     }
 
     fn get_form_parameters(&self) -> Option<Vec<(&str, &str)>> {
-        Some(vec![("email", &self.email),
-                  ("password", &self.password)])
+        Some(vec![("email", &self.email), ("password", &self.password)])
     }
 }
 
@@ -74,21 +78,25 @@ impl RawResponse for RawLoginResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
-    fn get_url(){
+    fn get_url() {
         let req = Login::new("email@email.com", "Password!@%d");
 
-        assert_req_url(&req,
-                       "users/login.json",
-                       None);
+        assert_req_url(&req, "users/login.json", None);
     }
 
     #[test]
-    fn get_form_parameters(){
+    fn get_form_parameters() {
         let req = Login::new("email@email.com", "Password!@%d");
 
-        assert_eq!(Some(vec![("email", req.email.as_ref()),("password", req.password.as_ref())]), req.get_form_parameters());
+        assert_eq!(
+            Some(vec![
+                ("email", req.email.as_ref()),
+                ("password", req.password.as_ref())
+            ]),
+            req.get_form_parameters()
+        );
     }
 }

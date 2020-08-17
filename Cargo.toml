@@ -1,7 +1,8 @@
 [package]
 name = "pushover"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Steven Blake <s.blake.08@aberdeen.ac.uk>"]
+edition = "2018"
 
 description = "A wrapper for the Pushover API."
 documentation = "https://docs.rs/pushover"
@@ -11,18 +12,17 @@ homepage = "https://github.com/sb89/pushover"
 repository = "https://github.com/sb89/pushover.git"
 
 [dependencies]
-tokio-core = "0.1"
-error-chain = "0.10"
-serde = "1.0"
-serde_json = "1.0"
-serde_derive = "1.0"
-futures = "0.1"
-urlencoding = "1.0"
-url = "1.5"
+tokio-core = "0.1.17"
+error-chain = "0.12.4"
+serde = { version = "1.0.115", features = ["derive"]}
+serde_json = "1.0.57"
+urlencoding = "1.1.1"
+url = "2.1.1"
+tokio-test = "0.2.1"
 
 [dependencies.reqwest]
-version = "0.8"
-features = ["unstable"]
+version = "0.10.7"
+features = ["blocking", "json"]
 
 [dev-dependencies]
-mockito = "0.8"
+mockito = "0.27.0"

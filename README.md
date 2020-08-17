@@ -14,25 +14,23 @@ Add the following to `Cargo.toml`:
 
 ```toml
 [dependencies]
-pushover = "0.3.0"
+pushover = "0.4.0"
 ```
 
 Synchronous example:
 
 ```rust,no_run
 
-extern crate pushover;
-
-use pushover::SyncAPIBuilder;
+use pushover::API;
 use pushover::requests::message::SendMessage;
 
-fn main() {
-    let api = SyncAPIBuilder::new().build().expect("Error creating API");
+fn send_message() {
+    let api = API::new();
 
     let msg = SendMessage::new("token", "user_key", "hello");
 
     let response = api.send(&msg);
-    println!("{:?}", response);
+    println!("{:?}", response.expect("Error sending message"));
 }
 ```
 
@@ -40,22 +38,15 @@ Asynchronous example:
 
 ```rust,no_run
 
-extern crate pushover;
-extern crate tokio_core;
-
-use pushover::AsyncAPIBuilder;
+use pushover::API;
 use pushover::requests::message::SendMessage;
-use tokio_core::reactor::Core;
 
-fn main() {
-    let mut core = Core::new().expect("Error creating core");
-    let handle = core.handle();
-
-    let api = AsyncAPIBuilder::new().build(&handle).expect("Error creating API");
+async fn send_message() {
+    let api = API::new();
 
     let msg = SendMessage::new("token", "user_key", "hello");
-    let work = api.send(&msg);
+    let response = api.send_async(&msg).await;
 
-    println!("{:?}", core.run(work).expect("Error sending message"));
+    println!("{:?}", response.expect("Error sending message"));
 }
 ```
