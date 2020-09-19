@@ -1,23 +1,25 @@
 use std::fmt;
 
+use crate::error::ErrorKind;
 use reqwest::Method;
-use serde::de::{Deserialize, DeserializeOwned, Deserializer};
-use error::ErrorKind;
-use url::{Url, UrlQuery};
+use serde::de::{DeserializeOwned, Deserializer};
+use serde::{Deserialize, Serialize};
 use url::form_urlencoded::Serializer;
+use url::{Url, UrlQuery};
 
 use std::fmt::Debug;
 
 pub trait RawResponse: DeserializeOwned + 'static {
-    fn get_error(&self) -> Option<::error::ErrorKind> {
+    fn get_error(&self) -> Option<crate::error::ErrorKind> {
         if self.status() != 1 {
-            Some(::error::ErrorKind::PushoverError {
-                     status: self.status(),
-                     request: self.request().to_string(),
-                     errors: self.errors()
-                         .clone()
-                         .expect("Expected error array from Pushover API"),
-                 })
+            Some(crate::error::ErrorKind::PushoverError {
+                status: self.status(),
+                request: self.request().to_string(),
+                errors: self
+                    .errors()
+                    .clone()
+                    .expect("Expected error array from Pushover API"),
+            })
         } else {
             None
         }
@@ -31,26 +33,26 @@ pub trait RawResponse: DeserializeOwned + 'static {
 }
 
 macro_rules! raw_response_basic_getters {
-    () => (
+    () => {
         fn status(&self) -> i32 {
             self.status
         }
 
-        fn request(&self) -> &str { 
+        fn request(&self) -> &str {
             &self.request
         }
 
         fn errors(&self) -> &Option<Vec<String>> {
             &self.errors
-        } 
-    )
+        }
+    };
 }
 
 pub trait Request {
     type ResponseType: Debug + 'static;
     type RawResponseType: RawResponse;
 
-    fn build_url(&self, &mut Url);
+    fn build_url(&self, url: &mut Url);
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType;
 
@@ -69,7 +71,8 @@ pub enum Response<T: Request> {
 
 impl<'de, T: Request> Deserialize<'de> for Response<T> {
     fn deserialize<D>(deserializer: D) -> Result<Response<T>, D::Error>
-        where D: Deserializer<'de>
+    where
+        D: Deserializer<'de>,
     {
         let raw: T::RawResponseType = Deserialize::deserialize(deserializer)?;
 
@@ -93,7 +96,8 @@ impl RawResponse for RawBasicResponse {
 }
 
 pub fn add_optional_param<V>(params: &mut Serializer<UrlQuery>, key: &str, value: &Option<V>)
-    where V: fmt::Display
+where
+    V: fmt::Display,
 {
     if let Some(ref a) = *value {
         params.append_pair(key, &a.to_string());
@@ -112,7 +116,7 @@ mod tests {
         type RawResponseType = RawTestResponse;
 
         fn get_method(&self) -> Method {
-            Method::Post
+            Method::POST
         }
 
         fn build_url(&self, _: &mut Url) {}
@@ -149,10 +153,10 @@ mod tests {
 
         match resp {
             Response::Error::<TestRequest>(ErrorKind::PushoverError {
-                                               status,
-                                               errors,
-                                               request,
-                                           }) => {
+                status,
+                errors,
+                request,
+            }) => {
                 assert_eq!(status, raw_response.status);
                 assert_eq!(request, raw_response.request);
                 assert_eq!(Some(errors), raw_response.errors);
@@ -174,7 +178,7 @@ mod tests {
 
         match resp {
             Response::Success::<TestRequest>(response) => assert_eq!(response, raw_response),
-            _ => panic!("Received error")
+            _ => panic!("Received error"),
         }
     }
 }

@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse};
+use crate::requests::base::{RawBasicResponse, Request};
 
 /// Cancel an emergency priority notification
 ///
@@ -14,8 +14,9 @@ pub struct CancelEmergency {
 
 impl CancelEmergency {
     pub fn new<R, T>(token: T, receipt: R) -> Self
-        where R: Into<String>,
-              T: Into<String>
+    where
+        R: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -29,7 +30,7 @@ impl Request for CancelEmergency {
     type RawResponseType = RawBasicResponse;
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn build_url(&self, url: &mut Url) {
@@ -51,15 +52,16 @@ impl Request for CancelEmergency {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = CancelEmergency::new("canc_token", "canc_receipt");
 
-        assert_req_url(&req,
-                       &format!("receipts/{}/cancel.json", req.receipt),
-                       Some(&[("token", &req.token)]));
-
+        assert_req_url(
+            &req,
+            &format!("receipts/{}/cancel.json", req.receipt),
+            Some(&[("token", &req.token)]),
+        );
     }
 }

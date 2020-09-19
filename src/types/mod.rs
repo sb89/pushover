@@ -1,12 +1,14 @@
-mod user;
-mod priority;
 mod operating_system;
+mod priority;
 mod sound;
+mod user;
 
-pub use self::user::User;
-pub use self::priority::Priority;
+use serde::Deserialize;
+
 pub use self::operating_system::OperatingSystem;
+pub use self::priority::Priority;
 pub use self::sound::Sound;
+pub use self::user::User;
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum UserType {

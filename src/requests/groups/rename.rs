@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse};
+use crate::requests::base::{RawBasicResponse, Request};
 
 /// Rename a group
 ///
@@ -15,9 +15,10 @@ pub struct Rename {
 
 impl Rename {
     pub fn new<G, N, T>(token: T, group_key: G, name: N) -> Self
-        where G: Into<String>,
-              N: Into<String>,
-              T: Into<String>
+    where
+        G: Into<String>,
+        N: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -44,7 +45,7 @@ impl Request for Rename {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -55,14 +56,16 @@ impl Request for Rename {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = Rename::new("rename_token", "rename_group_key", "rename name");
 
-        assert_req_url(&req,
-                       &format!("groups/{}/rename.json", req.group_key),
-                       Some(&[("token", &req.token), ("name", &req.name)]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}/rename.json", req.group_key),
+            Some(&[("token", &req.token), ("name", &req.name)]),
+        );
     }
 }

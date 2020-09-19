@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse};
+use crate::requests::base::{RawBasicResponse, Request};
 
 /// Delete Messages
 ///
@@ -15,8 +15,9 @@ pub struct DeleteMessages {
 
 impl DeleteMessages {
     pub fn new<D, S>(secret: S, device_id: D, message: u32) -> Self
-        where D: Into<String>,
-              S: Into<String>
+    where
+        D: Into<String>,
+        S: Into<String>,
     {
         Self {
             device_id: device_id.into(),
@@ -40,11 +41,10 @@ impl Request for DeleteMessages {
         let mut params = url.query_pairs_mut();
         params.append_pair("secret", &self.secret);
         params.append_pair("message", &self.message.to_string());
-
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -55,15 +55,19 @@ impl Request for DeleteMessages {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = DeleteMessages::new("del_secret", "del_device", 10);
 
-        assert_req_url(&req,
-                       &format!("devices/{}/update_highest_message.json", req.device_id),
-                       Some(&[("secret", &req.secret),
-                         ("message", &req.message.to_string())]));
+        assert_req_url(
+            &req,
+            &format!("devices/{}/update_highest_message.json", req.device_id),
+            Some(&[
+                ("secret", &req.secret),
+                ("message", &req.message.to_string()),
+            ]),
+        );
     }
 }

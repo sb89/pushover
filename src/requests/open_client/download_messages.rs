@@ -1,8 +1,9 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{RawResponse, Request};
-use types::Message;
+use crate::requests::base::{RawResponse, Request};
+use crate::types::Message;
 
 /// Download messages
 ///
@@ -15,8 +16,9 @@ pub struct DownloadMessages {
 
 impl DownloadMessages {
     pub fn new<D, S>(secret: S, device_id: D) -> Self
-        where D: Into<String>,
-              S: Into<String>
+    where
+        D: Into<String>,
+        S: Into<String>,
     {
         Self {
             secret: secret.into(),
@@ -35,11 +37,10 @@ impl Request for DownloadMessages {
         let mut params = url.query_pairs_mut();
         params.append_pair("secret", &self.secret);
         params.append_pair("device_id", &self.device_id);
-
     }
 
     fn get_method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -72,15 +73,16 @@ impl RawResponse for RawDownloadMessagesResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = DownloadMessages::new("down_secret", "down_device");
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("secret", &req.secret), ("device_id", &req.device_id)]));
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[("secret", &req.secret), ("device_id", &req.device_id)]),
+        );
     }
-
 }

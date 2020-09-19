@@ -1,8 +1,9 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{Request, RawResponse};
-use types::User;
+use crate::requests::base::{RawResponse, Request};
+use crate::types::User;
 
 /// Retrieve users of a group
 ///
@@ -15,8 +16,9 @@ pub struct ListUsers {
 
 impl ListUsers {
     pub fn new<R, T>(token: T, group_key: R) -> Self
-        where R: Into<String>,
-              T: Into<String>
+    where
+        R: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -40,7 +42,7 @@ impl Request for ListUsers {
     }
 
     fn get_method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -76,14 +78,16 @@ impl RawResponse for RawListUsersResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = ListUsers::new("get_token", "get_group_key");
 
-        assert_req_url(&req,
-                       &format!("groups/{}.json", req.group_key),
-                       Some(&[("token", &req.token)]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}.json", req.group_key),
+            Some(&[("token", &req.token)]),
+        );
     }
 }

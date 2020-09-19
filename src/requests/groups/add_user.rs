@@ -1,8 +1,8 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse, add_optional_param};
-use types::User;
+use crate::requests::base::{add_optional_param, RawBasicResponse, Request};
+use crate::types::User;
 
 /// Add a user to a group
 ///
@@ -16,8 +16,9 @@ pub struct AddUser {
 
 impl AddUser {
     pub fn new<R, T>(token: T, group_key: R, user: &User) -> Self
-        where R: Into<String>,
-              T: Into<String>
+    where
+        R: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -32,7 +33,11 @@ impl Request for AddUser {
     type RawResponseType = RawBasicResponse;
 
     fn build_url(&self, url: &mut Url) {
-        url.path_segments_mut().unwrap().push("groups").push(&self.group_key).push("add_user.json");
+        url.path_segments_mut()
+            .unwrap()
+            .push("groups")
+            .push(&self.group_key)
+            .push("add_user.json");
 
         let mut params = url.query_pairs_mut();
         params.append_pair("token", &self.token);
@@ -42,7 +47,7 @@ impl Request for AddUser {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -53,7 +58,7 @@ impl Request for AddUser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_with_all_fields() {
@@ -63,12 +68,16 @@ mod tests {
 
         let req = AddUser::new("add_token", "add_group_key", &user);
 
-        assert_req_url(&req,
-                       &format!("groups/{}/add_user.json", req.group_key),
-                       Some(&[("token", &req.token),
-                         ("user", &req.user.user),
-                         ("device", req.user.device.as_ref().unwrap()),
-                         ("memo", req.user.memo.as_ref().unwrap())]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}/add_user.json", req.group_key),
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user.user),
+                ("device", req.user.device.as_ref().unwrap()),
+                ("memo", req.user.memo.as_ref().unwrap()),
+            ]),
+        );
     }
 
     #[test]
@@ -77,9 +86,10 @@ mod tests {
 
         let req = AddUser::new("add_token", "add_group_key", &user);
 
-        assert_req_url(&req,
-                       &format!("groups/{}/add_user.json", req.group_key),
-                       Some(&[("token", &req.token),
-                         ("user", &req.user.user)]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}/add_user.json", req.group_key),
+            Some(&[("token", &req.token), ("user", &req.user.user)]),
+        );
     }
 }

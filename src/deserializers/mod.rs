@@ -1,7 +1,8 @@
 use serde::de::{Deserialize, Deserializer};
 
 pub fn deserialize_option_empty_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     let result: Option<String> = Deserialize::deserialize(deserializer)?;
 

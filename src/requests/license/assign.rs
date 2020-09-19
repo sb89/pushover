@@ -1,9 +1,9 @@
 use reqwest::Method;
 use url::Url;
 
-use types::{OperatingSystem, UserType};
-use requests::license::check_credits::{CheckCreditsResponse, RawCheckCreditsResponse};
-use requests::base::{Request, add_optional_param};
+use crate::requests::base::{add_optional_param, Request};
+use crate::requests::license::check_credits::{CheckCreditsResponse, RawCheckCreditsResponse};
+use crate::types::{OperatingSystem, UserType};
 
 /// Assign a license
 ///
@@ -17,7 +17,8 @@ pub struct Assign {
 
 impl Assign {
     pub fn new<T>(token: T, user_type: UserType) -> Self
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -57,7 +58,7 @@ impl Request for Assign {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -71,27 +72,35 @@ impl Request for Assign {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_with_all_fields() {
-        let mut req = Assign::new("assign_token",
-                                  UserType::Email(String::from("email@email.com")));
+        let mut req = Assign::new(
+            "assign_token",
+            UserType::Email(String::from("email@email.com")),
+        );
         req.set_os(OperatingSystem::iOS);
 
-        assert_req_url(&req,
-                       "licenses/assign.json",
-                       Some(&[("token", &req.token),
-                              ("email", "email@email.com"),
-                              ("os", &req.os.as_ref().unwrap().to_string())]));
+        assert_req_url(
+            &req,
+            "licenses/assign.json",
+            Some(&[
+                ("token", &req.token),
+                ("email", "email@email.com"),
+                ("os", &req.os.as_ref().unwrap().to_string()),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_mandatory_fields() {
         let req = Assign::new("assign_token", UserType::UserKey(String::from("user_key")));
 
-        assert_req_url(&req,
-                       "licenses/assign.json",
-                       Some(&[("token", &req.token), ("user", "user_key")]));
+        assert_req_url(
+            &req,
+            "licenses/assign.json",
+            Some(&[("token", &req.token), ("user", "user_key")]),
+        );
     }
 }

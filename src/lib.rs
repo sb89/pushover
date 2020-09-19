@@ -7,25 +7,23 @@
 //!
 //! ```rust,ignore
 //! [dependencies]
-//! pushover = "0.3.0"
+//! pushover = "0.4.0"
 //! ```
 //!
 //! Synchronous example:
 //!
 //! ```rust,no_run
 //!
-//! extern crate pushover;
-//!
-//! use pushover::SyncAPIBuilder;
+//! use pushover::API;
 //! use pushover::requests::message::SendMessage;
 //!
-//! fn main() {
-//!     let api = SyncAPIBuilder::new().build().expect("Error creating API");
+//! fn send_message() {
+//!     let api = API::new();
 //!
 //!     let msg = SendMessage::new("token", "user_key", "hello");
 //!
 //!     let response = api.send(&msg);
-//!     println!("{:?}", response);
+//!     println!("{:?}", response.expect("Error sending message"));
 //! }
 //!
 //! ```
@@ -34,58 +32,38 @@
 //!
 //! ```rust,no_run
 //!
-//! extern crate pushover;
-//! extern crate tokio_core;
-//!
-//! use pushover::AsyncAPIBuilder;
+//! use pushover::API;
 //! use pushover::requests::message::SendMessage;
-//! use tokio_core::reactor::Core;
 //!
-//! fn main() {
-//!     let mut core = Core::new().expect("Error creating core");
-//!     let handle = core.handle();
-//!
-//!     let api = AsyncAPIBuilder::new().build(&handle).expect("Error creating API");
+//! async fn send_message() {
+//!     let api = API::new();
 //!
 //!     let msg = SendMessage::new("token", "user_key", "hello");
-//!     let work = api.send(&msg);
+//!     let response = api.send_async(&msg).await;
 //!
-//!     println!("{:?}", core.run(work).expect("Error sending message"));
+//!     println!("{:?}", response.expect("Error sending message"));
 //! }
 //! ```
 
-extern crate tokio_core;
-#[macro_use]
-extern crate error_chain;
-extern crate serde;
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
-extern crate futures;
-extern crate urlencoding;
-extern crate url;
-extern crate reqwest;
-
 mod client;
-mod error;
-mod future;
-mod types;
 mod deserializers;
+mod error;
 pub mod requests;
+mod types;
 
-pub use self::client::{AsyncAPI, AsyncAPIBuilder, SyncAPI, SyncAPIBuilder};
-pub use self::future::PushoverFuture;
-pub use self::types::{Priority, OperatingSystem, Sound, User, UserType};
+pub use self::client::API;
 pub use self::error::{Error, ErrorKind};
+pub use self::types::{OperatingSystem, Priority, Sound, User, UserType};
 
 #[cfg(test)]
 mod test {
-    use requests::Request;
+    use crate::client::{API_URL, API_VERSION};
+    use crate::requests::Request;
     use url::Url;
-    use client::{API_URL, API_VERSION};
 
     pub fn assert_req_url<R>(req: &R, path: &str, iter: Option<&[(&str, &str)]>)
-        where R: Request
+    where
+        R: Request,
     {
         let mut url = Url::parse(&format!("{}/{}", API_URL, API_VERSION)).unwrap();
         req.build_url(&mut url);

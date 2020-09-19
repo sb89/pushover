@@ -1,7 +1,8 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{RawResponse, Request};
+use crate::requests::base::{RawResponse, Request};
 
 /// Check license credits
 ///
@@ -13,9 +14,12 @@ pub struct CheckCredits {
 
 impl CheckCredits {
     pub fn new<T>(token: T) -> Self
-        where T: Into<String>
+    where
+        T: Into<String>,
     {
-        Self { token: token.into() }
+        Self {
+            token: token.into(),
+        }
     }
 }
 
@@ -31,7 +35,7 @@ impl Request for CheckCredits {
     }
 
     fn get_method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -64,14 +68,12 @@ impl RawResponse for RawCheckCreditsResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url() {
         let req = CheckCredits::new("check_token");
 
-        assert_req_url(&req,
-                       "licenses.json",
-                       Some(&[("token", &req.token)]));
+        assert_req_url(&req, "licenses.json", Some(&[("token", &req.token)]));
     }
 }
