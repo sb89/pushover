@@ -1,8 +1,9 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{Request, RawResponse, add_optional_param};
-use types::{Priority, Sound};
+use crate::requests::base::{add_optional_param, RawResponse, Request};
+use crate::types::{Priority, Sound};
 
 /// Send a message
 ///
@@ -23,9 +24,10 @@ pub struct SendMessage {
 
 impl SendMessage {
     pub fn new<M, T, U>(token: T, user_key: U, message: M) -> Self
-        where T: Into<String>,
-              U: Into<String>,
-              M: Into<String>
+    where
+        T: Into<String>,
+        U: Into<String>,
+        M: Into<String>,
     {
         Self {
             token: token.into(),
@@ -98,10 +100,11 @@ impl Request for SendMessage {
             params.append_pair("priority", &value.to_string());
 
             if let Priority::Emergency {
-                       retry,
-                       expire,
-                       ref callback_url,
-                   } = *value {
+                retry,
+                expire,
+                ref callback_url,
+            } = *value
+            {
                 params.append_pair("retry", &retry.to_string());
                 params.append_pair("expire", &expire.to_string());
                 add_optional_param(&mut params, "callback", callback_url);
@@ -110,7 +113,7 @@ impl Request for SendMessage {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -143,7 +146,7 @@ impl RawResponse for RawSendMessageResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_with_all_fields() {
@@ -156,29 +159,37 @@ mod tests {
         req.set_priority(Priority::Normal);
         req.set_sound(Sound::Pushover);
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user_key),
-                         ("message", &req.message),
-                         ("title", req.title.as_ref().unwrap()),
-                         ("url", req.url.as_ref().unwrap()),
-                         ("url_title", req.url_title.as_ref().unwrap()),
-                         ("timestamp", req.timestamp.as_ref().unwrap()),
-                         ("sound", &req.sound.as_ref().unwrap().to_string()),
-                         ("device", &req.devices[0]),
-                         ("priority", &req.priority.as_ref().unwrap().to_string())]));
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("message", &req.message),
+                ("title", req.title.as_ref().unwrap()),
+                ("url", req.url.as_ref().unwrap()),
+                ("url_title", req.url_title.as_ref().unwrap()),
+                ("timestamp", req.timestamp.as_ref().unwrap()),
+                ("sound", &req.sound.as_ref().unwrap().to_string()),
+                ("device", &req.devices[0]),
+                ("priority", &req.priority.as_ref().unwrap().to_string()),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_mandatory_fields() {
         let req = SendMessage::new("send_token", "send user", "send message");
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user_key),
-                         ("message", &req.message)]));
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("message", &req.message),
+            ]),
+        );
     }
 
     #[test]
@@ -190,46 +201,62 @@ mod tests {
 
         let list: String = req.devices.join(",");
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user_key),
-                         ("message", &req.message),
-                         ("device", &list)]));
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("message", &req.message),
+                ("device", &list),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_emergency_priority_with_callback() {
         let mut req = SendMessage::new("send_token", "send user", "send message");
         req.set_priority(Priority::Emergency {
-                             retry: 10,
-                             expire: 20,
-                             callback_url: Some(String::from("emergency url")),
-                         });
+            retry: 10,
+            expire: 20,
+            callback_url: Some(String::from("emergency url")),
+        });
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user_key),
-                         ("message", &req.message),
-                         ("priority", &req.priority.as_ref().unwrap().to_string()),
-                         ("retry", "10"),
-                         ("expire", "20"),
-                         ("callback", "emergency url")]));
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("message", &req.message),
+                ("priority", &req.priority.as_ref().unwrap().to_string()),
+                ("retry", "10"),
+                ("expire", "20"),
+                ("callback", "emergency url"),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_emergency_priority_without_callback() {
         let mut req = SendMessage::new("send_token", "send user", "send message");
-        req.set_priority(Priority::Emergency{ retry: 10, expire: 20, callback_url: None});
+        req.set_priority(Priority::Emergency {
+            retry: 10,
+            expire: 20,
+            callback_url: None,
+        });
 
-        assert_req_url(&req,
-                       "messages.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user_key),
-                         ("message", &req.message),
-                         ("priority", &req.priority.as_ref().unwrap().to_string()),
-                         ("retry", "10"),
-                         ("expire", "20")])); 
+        assert_req_url(
+            &req,
+            "messages.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user_key),
+                ("message", &req.message),
+                ("priority", &req.priority.as_ref().unwrap().to_string()),
+                ("retry", "10"),
+                ("expire", "20"),
+            ]),
+        );
     }
 }

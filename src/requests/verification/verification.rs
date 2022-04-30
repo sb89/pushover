@@ -1,7 +1,8 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{Request, RawResponse, add_optional_param};
+use crate::requests::base::{add_optional_param, RawResponse, Request};
 
 /// Verify user/group
 ///
@@ -15,8 +16,9 @@ pub struct Verification {
 
 impl Verification {
     pub fn new<R, T>(token: T, user: R) -> Self
-        where R: Into<String>,
-              T: Into<String>
+    where
+        R: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -35,7 +37,10 @@ impl Request for Verification {
     type RawResponseType = RawVerificationResponse;
 
     fn build_url(&self, url: &mut Url) {
-        url.path_segments_mut().unwrap().push("users").push("validate.json");
+        url.path_segments_mut()
+            .unwrap()
+            .push("users")
+            .push("validate.json");
 
         let mut params = url.query_pairs_mut();
         params.append_pair("token", &self.token);
@@ -44,7 +49,7 @@ impl Request for Verification {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -76,27 +81,32 @@ impl RawResponse for RawVerificationResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_with_all_fields() {
         let mut req = Verification::new("ver_token", "ver user");
         req.set_device("ver device");
 
-        assert_req_url(&req,
-                       "users/validate.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user),
-                         ("device", &req.device.as_ref().unwrap())]));
+        assert_req_url(
+            &req,
+            "users/validate.json",
+            Some(&[
+                ("token", &req.token),
+                ("user", &req.user),
+                ("device", &req.device.as_ref().unwrap()),
+            ]),
+        );
     }
 
     #[test]
     fn get_url_with_mandatory_fields() {
         let req = Verification::new("ver_token", "ver user");
 
-        assert_req_url(&req,
-                       "users/validate.json",
-                       Some(&[("token", &req.token),
-                         ("user", &req.user)]));
+        assert_req_url(
+            &req,
+            "users/validate.json",
+            Some(&[("token", &req.token), ("user", &req.user)]),
+        );
     }
 }

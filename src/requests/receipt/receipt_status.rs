@@ -1,7 +1,8 @@
 use reqwest::Method;
+use serde::Deserialize;
 use url::Url;
 
-use requests::base::{Request, RawResponse};
+use crate::requests::base::{RawResponse, Request};
 
 /// Retrieve status of emergency notification
 ///
@@ -14,8 +15,9 @@ pub struct ReceiptStatus {
 
 impl ReceiptStatus {
     pub fn new<R, T>(token: T, receipt: R) -> Self
-        where R: Into<String>,
-              T: Into<String>
+    where
+        R: Into<String>,
+        T: Into<String>,
     {
         Self {
             token: token.into(),
@@ -29,7 +31,7 @@ impl Request for ReceiptStatus {
     type RawResponseType = RawReceiptStatusResponse;
 
     fn get_method(&self) -> Method {
-        Method::Get
+        Method::GET
     }
 
     fn build_url(&self, url: &mut Url) {
@@ -96,14 +98,16 @@ impl RawResponse for RawReceiptStatusResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_() {
         let req = ReceiptStatus::new("receipt_token", "receipt");
 
-        assert_req_url(&req,
-                       &format!("receipts/{}.json", req.receipt),
-                       Some(&[("token", &req.token)]));
+        assert_req_url(
+            &req,
+            &format!("receipts/{}.json", req.receipt),
+            Some(&[("token", &req.token)]),
+        );
     }
 }

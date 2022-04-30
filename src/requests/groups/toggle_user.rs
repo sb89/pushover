@@ -1,7 +1,7 @@
 use reqwest::Method;
 use url::Url;
 
-use requests::base::{Request, RawBasicResponse};
+use crate::requests::base::{RawBasicResponse, Request};
 
 /// Disable/enable a user for a group
 ///
@@ -16,9 +16,10 @@ pub struct ToggleUser {
 
 impl ToggleUser {
     pub fn new<G, T, U>(token: T, group_key: G, user_key: U, toggle: bool) -> Self
-        where G: Into<String>,
-              T: Into<String>,
-              U: Into<String>
+    where
+        G: Into<String>,
+        T: Into<String>,
+        U: Into<String>,
     {
         Self {
             token: token.into(),
@@ -48,7 +49,7 @@ impl Request for ToggleUser {
     }
 
     fn get_method(&self) -> Method {
-        Method::Post
+        Method::POST
     }
 
     fn map(raw: Self::RawResponseType) -> Self::ResponseType {
@@ -59,23 +60,27 @@ impl Request for ToggleUser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::assert_req_url;
+    use crate::test::assert_req_url;
 
     #[test]
     fn get_url_enable() {
         let req = ToggleUser::new("toggle_token", "toggle_group_key", "toggle_user_key", true);
 
-        assert_req_url(&req,
-                       &format!("groups/{}/enable_user.json", req.group_key),
-                       Some(&[("token", &req.token), ("user", &req.user_key)]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}/enable_user.json", req.group_key),
+            Some(&[("token", &req.token), ("user", &req.user_key)]),
+        );
     }
 
     #[test]
     fn get_url_disable() {
         let req = ToggleUser::new("toggle_token", "toggle_group_key", "toggle_user_key", false);
 
-        assert_req_url(&req,
-                       &format!("groups/{}/disable_user.json", req.group_key),
-                       Some(&[("token", &req.token), ("user", &req.user_key)]));
+        assert_req_url(
+            &req,
+            &format!("groups/{}/disable_user.json", req.group_key),
+            Some(&[("token", &req.token), ("user", &req.user_key)]),
+        );
     }
 }
