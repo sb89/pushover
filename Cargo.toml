@@ -1,7 +1,7 @@
 [package]
 name = "pushover"
 version = "0.4.0"
-authors = ["Steven Blake <s.blake.08@aberdeen.ac.uk>"]
+authors = ["Steven Blake <s.blake.191289@gmail.com>"]
 edition = "2018"
 
 description = "A wrapper for the Pushover API."

@@ -25,7 +25,7 @@ impl ToggleUser {
             token: token.into(),
             group_key: group_key.into(),
             user_key: user_key.into(),
-            toggle: toggle,
+            toggle,
         }
     }
 }

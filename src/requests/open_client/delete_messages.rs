@@ -22,7 +22,7 @@ impl DeleteMessages {
         Self {
             device_id: device_id.into(),
             secret: secret.into(),
-            message: message,
+            message,
         }
     }
 }

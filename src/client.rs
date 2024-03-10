@@ -6,8 +6,8 @@ use std::time::Duration;
 use crate::error::Error;
 use crate::requests::{Request, Response};
 
-pub const API_URL: &'static str = "https://api.pushover.net";
-pub const API_VERSION: &'static str = "1";
+pub const API_URL: &str = "https://api.pushover.net";
+pub const API_VERSION: &str = "1";
 const DEFAULT_TIMEOUT: u64 = 30;
 
 pub struct API {
@@ -15,12 +15,18 @@ pub struct API {
     timeout: Duration,
 }
 
-impl API {
-    pub fn new() -> Self {
+impl Default for API {
+    fn default() -> Self {
         Self {
             timeout: Duration::from_secs(DEFAULT_TIMEOUT),
             base_url: API_URL.to_owned(),
         }
+    }
+}
+
+impl API {
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn timeout(mut self, timeout: Duration) -> Self {
@@ -45,7 +51,7 @@ impl API {
 
         let req = if let Some(params) = request.get_form_parameters() {
             let encoded: String = form_urlencoded::Serializer::new(String::new())
-                .extend_pairs(params.into_iter())
+                .extend_pairs(params)
                 .finish();
 
             req.body(encoded)

@@ -7,7 +7,7 @@ where
     let result: Option<String> = Deserialize::deserialize(deserializer)?;
 
     match result {
-        Some(ref x) if x == "" => Ok(None),
+        Some(ref x) if x.is_empty() => Ok(None),
         _ => Ok(result),
     }
 }

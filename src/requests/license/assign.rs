@@ -23,7 +23,7 @@ impl Assign {
         Self {
             token: token.into(),
             os: None,
-            user_type: user_type,
+            user_type,
         }
     }
 
