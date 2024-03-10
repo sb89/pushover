@@ -2,7 +2,7 @@
 name = "pushover"
 version = "0.4.0"
 authors = ["Steven Blake <s.blake.191289@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 description = "A wrapper for the Pushover API."
 documentation = "https://docs.rs/pushover"
